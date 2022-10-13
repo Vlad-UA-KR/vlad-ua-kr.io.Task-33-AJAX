@@ -1,4 +1,4 @@
-const url = 'http://www.omdbapi.com/?apikey=d19f2996';
+const url = 'https://www.omdbapi.com/?apikey=d19f2996';
 const searchForm = document.querySelector('#search-form');
 const list = document.querySelector('.film-list');
 const listItem = document.querySelector('.item');
@@ -15,11 +15,18 @@ async function readyResponse() {
 		let li = document.createElement('li');
 		li.classList.add('item');
 		li.dataset.id = `${el.imdbID}`;
+		if (el.Poster == 'N/A') {
+			li.prepend
+			li.innerHTML = `<img src="../../img/Camera.webp" alt="${el.Title}" class="item__image">
+		<h2 class="item__title">${el.Title}</h2>
+		<p class="item__text">${el.Year}</p>`;
+			list.append(li);
+			return;
+		}
 		li.innerHTML = `<img src="${el.Poster}" alt="${el.Title}" class="item__image">
 		<h2 class="item__title">${el.Title}</h2>
 		<p class="item__text">${el.Year}</p>`;
 		list.append(li);
-		console.log(el);
 	})
 }
 
@@ -51,6 +58,13 @@ async function getResponse(e) {
 		let li = document.createElement('li');
 		li.classList.add('item');
 		li.dataset.id = `${el.imdbID}`;
+		if (el.Poster == 'N/A') {
+			li.innerHTML = `<img src="../../img/Camera.webp" alt="${el.Title}" class="item__image">
+		<h2 class="item__title">${el.Title}</h2>
+		<p class="item__text">${el.Year}</p>`;
+			list.append(li);
+			return;
+		}
 		li.innerHTML = `<img src="${el.Poster}" alt="${el.Title}" class="item__image">
 		<h2 class="item__title">${el.Title}</h2>
 		<p class="item__text"><span>${el.Year}</span></p>`;
