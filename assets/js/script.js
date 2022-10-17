@@ -30,7 +30,7 @@ function createFilmList(resultArray) {
 		let image = el.Poster;
 
 		if (image == 'N/A') {
-			image = "../../img/Camera.webp";
+			image = "../../img/Camera.svg";
 		}
 
 		li.innerHTML = `<img src="${image}" alt="${el.Title}" class="item__image">
@@ -201,7 +201,7 @@ function createModal(json) {
 	let image = json.Poster;
 
 	if (image == 'N/A') {
-		image = '../../img/Camera.webp';
+		image = '../../img/Camera.svg';
 	}
 
 	let overlay = document.createElement('div');
