@@ -30,7 +30,7 @@ function createFilmList(resultArray) {
 		let image = el.Poster;
 
 		if (image == 'N/A') {
-			image = "../../img/Camera.svg";
+			image = "https://cdn.pixabay.com/photo/2013/07/12/13/58/camera-147680_960_720.png";
 		}
 
 		li.innerHTML = `<img src="${image}" alt="${el.Title}" class="item__image">
@@ -201,7 +201,7 @@ function createModal(json) {
 	let image = json.Poster;
 
 	if (image == 'N/A') {
-		image = '../../img/Camera.svg';
+		image = 'https://cdn.pixabay.com/photo/2013/07/12/13/58/camera-147680_960_720.png';
 	}
 
 	let overlay = document.createElement('div');
