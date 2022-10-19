@@ -14,7 +14,7 @@ let currentUrl, oldUrl, allPages;
 async function getResponse() {
 	let response = await fetch(currentUrl);
 	json = await response.json();
-	allPages = Math.ceil(json.totalResults / maxToShow) + 3;
+	allPages = Math.ceil(json.totalResults / maxToShow);
 	return json;
 }
 
@@ -43,45 +43,60 @@ function createFilmList(resultArray) {
 
 //------------------Create-pagitation------------
 
+const maxPagEl = 9;
+let index = 0;
+
 function createPagination() {
 	const pagList = document.querySelector('.pagination');
 	pagList.innerHTML = '';
 
-	for (let i = 0; i <= allPages; i++) {
-		let li = document.createElement('li');
-		li.innerHTML = `<a href="" class="pagination__link">${i - 1}</a>`;
-		li.classList.add('pagination__item');
+	const startLi = document.createElement('li');
+	const prevLi = document.createElement('li');
+	startLi.classList.add('pagination__item');
+	startLi.innerHTML = `<a href="" class="pagination__link start"><<</a>`;
+	prevLi.classList.add('pagination__item');
+	prevLi.innerHTML = `<a href="" class="pagination__link prev"><</a>`;
+	pagList.prepend(prevLi);
+	pagList.prepend(startLi);
 
-		if (i == 0) {
-			li.innerHTML = `<a href="" class="pagination__link start"><<</a>`;
+	for (let i = 1; i <= maxPagEl; i++) {
+		let li = document.createElement('li');
+		if (i + index > allPages) {
+			break;
 		}
-		else if (i == 1) {
-			li.innerHTML = `<a href="" class="pagination__link prev"><</a>`;
-		}
-		else if (i == allPages - 1) {
-			li.innerHTML = `<a href="" class="pagination__link next">></a>`;
-		}
-		else if (i == allPages) {
-			li.innerHTML = `<a href="" class="pagination__link finish">>></a>`;
-		}
-		else if (i - 1 == currentPage) {
-			li.innerHTML = `<a href="" class="pagination__link active">${i - 1}</a>`;
-		}
+		li.innerHTML = `<a href="" class="pagination__link">${i + index}</a>`;
+		li.classList.add('pagination__item');
 
 		pagList.append(li);
 	}
 
-	const startLi = document.querySelector('.start');
-	const prevLi = document.querySelector('.prev');
-	const nextLi = document.querySelector('.next');
-	const finishLi = document.querySelector('.finish');
+	let liLinks = document.querySelectorAll('.pagination__link');
+	liLinks.forEach(a => {
+		if (a.innerText == `${currentPage}`) {
+			a.classList.add('active');
+		}
+	})
+
+	const finishLi = document.createElement('li');
+	const nextLi = document.createElement('li');
+	finishLi.classList.add('pagination__item');
+	finishLi.innerHTML = `<a href="" class="pagination__link finish">>></a>`;
+	nextLi.classList.add('pagination__item');
+	nextLi.innerHTML = `<a href="" class="pagination__link next">></a>`;
+	pagList.append(nextLi);
+	pagList.append(finishLi);
 
 	if (currentPage == 1) {
 		startLi.classList.add('non-active');
 		prevLi.classList.add('non-active');
 	}
 
-	if (currentPage == allPages - 3) {
+	if (currentPage == allPages) {
+		nextLi.classList.add('non-active');
+		finishLi.classList.add('non-active');
+	}
+
+	if (maxPagEl >= allPages) {
 		nextLi.classList.add('non-active');
 		finishLi.classList.add('non-active');
 	}
@@ -92,16 +107,28 @@ pagList.addEventListener('click', (e) => {
 	let link = e.target.closest('a');
 
 	if (link.innerText == '<<') {
+		index = 0;
 		currentPage = 1;
 	}
 	else if (link.innerText == '<') {
-		currentPage--;
+		index -= 9;
+		currentPage = Number(currentPage) - Number(maxPagEl);
+		if (currentPage < 1) {
+			currentPage = 1;
+			index = 0;
+		}
 	}
 	else if (link.innerText == '>') {
-		currentPage++;
+		index += 9;
+		currentPage = Number(currentPage) + Number(maxPagEl);
+		if (currentPage > allPages) {
+			currentPage = allPages;
+			index = allPages - (allPages % 9);
+		}
 	}
 	else if (link.innerText == '>>') {
-		currentPage = allPages - 3;
+		index = allPages - 9;
+		currentPage = allPages;
 	}
 	else {
 		currentPage = link.innerText;
@@ -128,7 +155,7 @@ pagList.addEventListener('click', (e) => {
 
 function loadDOMResponse() {
 
-	currentUrl = url + `&s=thor`;
+	currentUrl = url + `&s=batman`;
 
 	getResponse()
 		.then(json => {
@@ -189,7 +216,7 @@ async function submitResponse(e) {
 
 			createPagination();
 		})
-
+	currentPage = 1;
 };
 
 searchForm.addEventListener('submit', submitResponse);
@@ -267,3 +294,7 @@ document.addEventListener('click', async function (e) {
 //---------------------Reload-page---------------
 
 document.querySelector('.header__logo').addEventListener('click', () => document.location.reload());
+
+
+//----------------------------------------------------
+
