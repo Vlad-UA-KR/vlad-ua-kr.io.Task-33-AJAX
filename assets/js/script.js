@@ -2,9 +2,14 @@ const url = 'https://www.omdbapi.com/?apikey=d19f2996';
 const searchForm = document.querySelector('#search-form');
 const filmList = document.querySelector('.film-list');
 const filmListItem = document.querySelector('.item');
+const favList = document.querySelector('.favorites-list');
 const logoLink = document.querySelector('.header__logo');
 const container = document.querySelector('.main__container');
 const pagList = document.querySelector('.pagination');
+const defaultTitle = document.querySelector('.main__fav-title');
+const hideTitle = document.querySelector('.main__fav-title_empty');
+const favButton = document.querySelector('.main__fav-btn');
+const storage = window.localStorage;
 const maxToShow = 10;
 let currentPage = 1;
 let currentUrl, oldUrl, allPages;
@@ -24,7 +29,7 @@ async function getResponse() {
 function createFilmList(resultArray) {
 
 	resultArray.forEach(el => {
-		let li = document.createElement('li');
+		const li = document.createElement('li');
 		li.classList.add('item');
 		li.dataset.id = `${el.imdbID}`;
 		let image = el.Poster;
@@ -195,7 +200,7 @@ async function submitResponse(e) {
 			//-------If-Error---------
 
 			if (json.Response == 'False') {
-				let errTitle = document.createElement('h1');
+				const errTitle = document.createElement('h1');
 				errTitle.classList.add('film-list__error')
 				errTitle.innerHTML = `Movie not found!`;
 				filmList.append(errTitle);
@@ -245,13 +250,73 @@ function createModal(json) {
 			<p class="modal-container__country"><span>Country</span>${json.Country}</p>
 			<p class="modal-container__about-title">About</p>
 			<p class="modal-container__about-text">${json.Plot}</p>
+			<button class="modal-container__like" title="Add to favorites">Add to favorites</button>
 		</div>
 		<button class="modal-container__btn"><i class="fa-solid fa-xmark"></i></button>
 	</div>`;
 
 	overlay.classList.add('film-list__modal-overlay')
 	container.append(overlay);
+
+	//-------Add-To-Fav-List-----
+
+	document.querySelector('.modal-container__like').addEventListener('click', (e) => {
+
+		if (e.target.innerText == 'Add to favorites') {
+			storage.setItem(`${json.Title}`, `${json.imdbID}`);
+			e.target.innerText = 'Remove from favorites';
+		}
+
+		else if (e.target.innerText == 'Remove from favorites') {
+			storage.removeItem(`${json.Title}`);
+			e.target.innerText = 'Add to favorites';
+			favList.innerHTML = '';
+			getFavResponse();
+
+			if (storage.length == 0) {
+				defaultTitle.classList.add('hide');
+				hideTitle.classList.remove('hide');
+				favButton.classList.add('hide');
+			}
+
+			if (!storage.length == 0) {
+				defaultTitle.classList.remove('hide');
+				hideTitle.classList.add('hide');
+				favButton.classList.remove('hide');
+			}
+		}
+
+		e.target.blur();
+	})
 }
+
+document.addEventListener('click', async function (e) {
+
+	//--Create-modal-window---
+
+	if (e.target.closest('li') && e.target.closest('li').classList.contains('item')) {
+		body.classList.add('lock');
+		let currentItem = e.target.closest('li');
+		let id = currentItem.dataset.id;
+		oldUrl = currentUrl;
+		currentUrl = url + `&i=${id}`;
+
+		getResponse()
+			.then(json => {
+				createModal(json);
+				checkStorage(`${json.imdbID}`);
+			})
+
+		currentUrl = oldUrl;
+	}
+
+	//--Close-modal-window----
+
+	if (e.target.closest('button') && e.target.closest('button').className == 'modal-container__btn'
+		|| e.target.className == 'film-list__modal-overlay') {
+		closeModal()
+	}
+})
 
 //----------Close-Modal------
 
@@ -266,35 +331,114 @@ window.addEventListener('keydown', (e) => {
 	}
 })
 
-document.addEventListener('click', async function (e) {
-
-	//--Create-modal-window---
-
-	if (e.target.closest('li') && e.target.closest('li').className == 'item') {
-		body.classList.add('lock');
-		let currentItem = e.target.closest('li');
-		let id = currentItem.dataset.id;
-		oldUrl = currentUrl;
-		currentUrl = url + `&i=${id}`;
-
-		getResponse()
-			.then(json => createModal(json))
-
-		currentUrl = oldUrl;
-	}
-
-	//--Close-modal-window----
-
-	if (e.target.closest('button') && e.target.closest('button').className == 'modal-container__btn'
-		|| e.target.className == 'film-list__modal-overlay') {
-		closeModal()
-	}
-})
-
 //---------------------Reload-page---------------
 
 document.querySelector('.header__logo').addEventListener('click', () => document.location.reload());
 
 
-//----------------------------------------------------
+//---------------Create-Favorite-List------------
 
+function createFavItem(obj) {
+
+	let li = document.createElement('li');
+	li.classList.add('item');
+	li.dataset.id = `${obj.imdbID}`;
+	let image = obj.Poster;
+
+	if (image == 'N/A') {
+		image = "https://cdn.pixabay.com/photo/2013/07/12/13/58/camera-147680_960_720.png";
+	}
+
+	li.innerHTML = `<img src="${image}" alt="${obj.Title}" class="item__image">
+		<h2 class="item__title">${obj.Title}</h2>
+		<p class="item__text">${obj.Year}</p>`;
+
+	favList.append(li);
+
+}
+
+//-------Get-Fav-Response----
+
+function getFavResponse() {
+
+	for (let i = 0; i < storage.length; i++) {
+
+		oldUrl = currentUrl;
+		let key = storage.key(i);
+		currentUrl = url + `&i=${storage.getItem(key)}`;
+
+		getResponse()
+			.then(json => {
+				createFavItem(json)
+			})
+
+		currentUrl = oldUrl;
+	}
+}
+
+//-------Show-Fav-List-------
+
+document.querySelector('.header__favorites-btn').addEventListener('click', (e) => {
+	const overlay = document.querySelector('.main__favorites-inner');
+	const btn = e.target.closest('button');
+	const currentIcon = e.target.closest('i');
+	const closeBtn = document.querySelector('.header__favorites-btn_close');
+	const likeBtn = document.querySelector('.header__favorites-btn_like');
+	const favContainer = document.querySelector('.main__favorites-inner');
+	const filmListContainer = document.querySelector('.main__film-list-inner');
+
+	if (storage.length == 0) {
+		defaultTitle.classList.add('hide');
+		hideTitle.classList.remove('hide');
+		favButton.classList.add('hide');
+	}
+
+	if (!storage.length == 0) {
+		defaultTitle.classList.remove('hide');
+		hideTitle.classList.add('hide');
+		favButton.classList.remove('hide');
+	}
+
+	if (currentIcon.classList.contains('header__favorites-btn_like')) {
+
+		filmListContainer.classList.add('hide');
+		favContainer.classList.remove('hide');
+		closeBtn.classList.remove('hide');
+		likeBtn.classList.add('hide');
+
+		getFavResponse();
+	}
+
+	if (currentIcon.classList.contains('header__favorites-btn_close')) {
+		filmListContainer.classList.remove('hide');
+		favContainer.classList.add('hide');
+		closeBtn.classList.add('hide');
+		likeBtn.classList.remove('hide');
+		favList.innerHTML = '';
+	}
+
+	overlay.classList.toggle('active');
+	btn.blur();
+})
+
+//-------Check-Storage-------
+
+function checkStorage(id) {
+
+	for (let key in storage) {
+		if (storage[key] == id) {
+			const btn = document.querySelector('.modal-container__like');
+			btn.innerText = 'Remove from favorites';
+		} else continue
+	}
+}
+
+//-------Clear-Fav-List------
+
+favButton.addEventListener('click', (e) => {
+	storage.clear();
+	favList.innerHTML = '';
+	defaultTitle.classList.add('hide');
+	hideTitle.classList.remove('hide');
+	e.target.classList.add('hide');
+})

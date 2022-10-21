@@ -17,10 +17,17 @@
 
 		<header class="header">
 			<div class="header__container container">
-				<a href="#" class="header__logo">
-					<i class="fa-solid fa-film"></i>
-					<span>Filmoteka</span>
-				</a>
+				<div class="header__flex-row">
+					<a href="#" class="header__logo">
+						<i class="fa-solid fa-film"></i>
+						<span>Filmoteka</span>
+					</a>
+					<div class="header__favorites-wrapper">
+						<button class="header__favorites-btn" title="Open favorites">
+							<i class="fa-regular fa-heart header__favorites-btn_like"></i>
+							<i class="fa-solid fa-xmark header__favorites-btn_close hide"></i></button>
+					</div>
+				</div>
 				<form class="header__form" id="search-form">
 					<input class="header__input" type="text" name="title" id="input" placeholder="Please enter movie name">
 					<button class="header__submit" type="submit" id="btn"><i class="fa-solid fa-magnifying-glass"
@@ -30,12 +37,22 @@
 		</header>
 		<main class="main">
 			<div class="main__container container">
-				<ul class="main__film-list film-list">
+				<div class="main__film-list-inner">
+					<ul class="main__film-list film-list">
 
-				</ul>
-				<ul class="main__pagination pagination">
+					</ul>
+					<ul class="main__pagination pagination">
 
-				</ul>
+					</ul>
+				</div>
+				<div class="main__favorites-inner hide">
+					<h2 class="main__fav-title">Favorit list</h2>
+					<h2 class="main__fav-title main__fav-title_empty hide">Favorit list empty</h2>
+					<ul class="main__favorites-list favorites-list container">
+
+					</ul>
+					<button class="main__fav-btn hide">Clear favorite list</button>
+				</div>
 			</div>
 		</main>
 		<footer class="footer">

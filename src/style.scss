@@ -41,13 +41,46 @@ body {
 	background: linear-gradient(90deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
 		url(../../img/background.jpg) bottom no-repeat;
 	background-size: cover;
+	position: relative;
 
 	&__container {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
+		justify-content: center;
 		flex-wrap: wrap;
 		column-gap: 50px;
+	}
+
+	&__flex-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		width: 100%;
+		position: relative;
+		z-index: 5;
+	}
+
+	&__favorites-btn {
+		width: 35px;
+		background-color: transparent;
+		position: relative;
+		z-index: 5;
+
+		i {
+			color: red;
+			font-size: 28px;
+			transition: all 0.2s ease-in;
+			&.hide {
+				display: none;
+			}
+		}
+	}
+
+	&__favorites-btn:hover,
+	&__favorites-btn:focus {
+		i {
+			color: orange;
+		}
 	}
 
 	&__logo {
@@ -133,10 +166,57 @@ body {
 	flex: 1 1 auto;
 
 	&__container {
-		margin-top: 80px;
-		margin-bottom: 150px;
+		margin-top: 50px;
+		margin-bottom: 50px;
+	}
+
+	// -----------MAIN-Favorites-List--------
+
+	&__favorites-inner {
+		flex-direction: column;
+		display: none;
+		width: 100%;
+		height: 100%;
+
+		&.active {
+			display: flex;
+		}
+	}
+
+	&__fav-title {
+		font-size: 30px;
+		font-weight: 700;
+		margin: 0 auto 20px;
+	}
+
+	&__favorites-list {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 50px 50px;
+		margin-top: 30px;
+	}
+
+	&__fav-btn {
+		margin: 50px auto 10px;
+		display: block;
+		background-color: orange;
+		transition: all 0.2s ease-in;
+		padding: 10px 10px;
+		border-radius: 10px;
+		font-weight: 700;
+	}
+
+	&__fav-btn:hover,
+	&__fav-btn:focus {
+		background-color: darken($color: orange, $amount: 8%);
+		color: darken($color: black, $amount: 20%);
 	}
 }
+
+// -------------MAIN-Film-List-----------
 
 .film-list {
 	width: 100%;
@@ -168,6 +248,8 @@ body {
 	}
 }
 
+// -------------MAIN-Modal-Container-----
+
 .modal-container {
 	width: 100%;
 	max-width: 850px;
@@ -178,9 +260,9 @@ body {
 	position: relative;
 	display: flex;
 	justify-content: center;
+	align-items: flex-start;
 	flex-wrap: wrap;
 	gap: 20px 40px;
-	align-items: center;
 	border-radius: 10px;
 	z-index: 6;
 	overflow: auto;
@@ -192,7 +274,7 @@ body {
 	}
 
 	&__details {
-		height: 480px;
+		min-height: 100%;
 		width: 100%;
 		max-width: 350px;
 
@@ -206,7 +288,7 @@ body {
 		}
 
 		p {
-			margin-top: 15px;
+			margin-top: 9px;
 			line-height: 1.1;
 			display: flex;
 			align-items: center;
@@ -215,34 +297,56 @@ body {
 
 	&__btn {
 		position: absolute;
+		background-color: transparent;
 		top: 20px;
 		right: 20px;
-		background-color: white;
-		font-size: 25px;
-		transition: all 0.2s ease-in;
+		i {
+			font-size: 25px;
+			transition: all 0.2s ease-in;
+		}
 	}
 
 	&__btn:hover,
 	&__btn:focus {
-		color: orange;
+		i {
+			color: orange;
+		}
+	}
+
+	&__like {
+		margin: 12px auto 10px;
+		display: block;
+		background-color: orange;
+		transition: all 0.2s ease-in;
+		padding: 10px 10px;
+		border-radius: 10px;
+		font-weight: 700;
+	}
+
+	&__like:hover,
+	&__like:focus {
+		background-color: darken($color: orange, $amount: 8%);
+		color: darken($color: black, $amount: 20%);
 	}
 
 	&__title {
 		font-size: 30px;
 		font-weight: 900;
-		margin-bottom: 25px;
+		margin-bottom: 20px;
 	}
 
 	&__about-title {
 		font-weight: 900;
 		font-size: 18px;
-		padding-top: 10px;
+		padding-top: 5px;
 	}
 
 	&__about-text {
 		text-align: justify;
 	}
 }
+
+// ------MAIN-Film-List-Item-------------
 
 .item {
 	width: 300px;
@@ -284,6 +388,8 @@ body {
 	}
 }
 
+// ----------MAIN-Pagination-------------
+
 .pagination {
 	display: flex;
 	justify-content: center;
@@ -320,7 +426,7 @@ body {
 	}
 }
 
-// ---------------------MAIN-MEDIA---------
+// ------------MAIN-MEDIA----------------
 
 @media (max-width: 1030px) {
 	.film-list {
@@ -380,4 +486,8 @@ body {
 			color: orange;
 		}
 	}
+}
+
+.hide {
+	display: none;
 }
